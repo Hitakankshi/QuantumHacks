@@ -19,6 +19,8 @@ import { UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Icons } from '@/components/icons';
+import { useAuth } from '@/firebase';
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -33,6 +35,7 @@ const formSchema = z.object({
 export default function SignupPage() {
   const { toast } = useToast();
   const router = useRouter();
+  const auth = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -43,25 +46,39 @@ export default function SignupPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    toast({
-      title: 'Account Created!',
-      description: "Welcome! We're glad to have you.",
-    });
-    router.push('/dashboard');
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await createUserWithEmailAndPassword(auth, values.email, values.password);
+      toast({
+        title: 'Account Created!',
+        description: "Welcome! We're glad to have you.",
+      });
+      router.push('/dashboard');
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Sign-up Failed',
+        description: error.message,
+      });
+    }
   }
 
-  function onGoogleSignUp() {
-    // In a real app, this would trigger the Firebase Google Auth flow
-    toast({
-        title: 'Signing up with Google...',
-        description: 'You will be redirected shortly.',
-    });
-    // Simulate a redirect to dashboard after a short delay
-    setTimeout(() => {
-        router.push('/dashboard');
-    }, 1000);
+  async function onGoogleSignUp() {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      toast({
+          title: 'Sign-up Successful!',
+          description: 'Welcome to QuantumHacks!',
+      });
+      router.push('/dashboard');
+    } catch (error: any) {
+        toast({
+            variant: 'destructive',
+            title: 'Google Sign-up Failed',
+            description: error.message,
+        });
+    }
   }
 
   return (
