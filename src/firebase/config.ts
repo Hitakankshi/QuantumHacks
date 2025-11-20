@@ -1,10 +1,8 @@
 export const firebaseConfig = {
-  apiKey: "AIzaSyA-7WBe3TLuQrW5J7OM80fF5WgGwDAu1CU",
-  authDomain: "quantumhacks-86889.firebaseapp.com",
-  databaseURL: "https://quantumhacks-86889-default-rtdb.firebaseio.com",
-  projectId: "quantumhacks-86889",
-  storageBucket: "quantumhacks-86889.firebasestorage.app",
-  messagingSenderId: "921863172776",
-  appId: "1:921863172776:web:d21bfc00c8b553c462c89d",
-  measurementId: "G-7J10BJD2Z0"
+  apiKey: "AIzaSyBJuZcMQUqmnk8PnceYnYOMDgQCB0lnADE",
+  authDomain: "studio-2383970766-fc9aa.firebaseapp.com",
+  projectId: "studio-2383970766-fc9aa",
+  storageBucket: "studio-2383970766-fc9aa.appspot.com",
+  messagingSenderId: "875597201698",
+  appId: "1:875597201698:web:dd2b2beac092c63beba57b"
 };
