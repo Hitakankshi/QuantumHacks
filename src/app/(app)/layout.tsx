@@ -14,11 +14,12 @@ import {
 import { getReports } from '@/lib/data';
 import { Bell, CreditCard, Home, LineChart, LogOut, Mail, Settings, User } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import type React from 'react';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const reports = getReports();
 
   const navItems = [
@@ -28,6 +29,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: '/contact', icon: Mail, label: 'Contact Us' },
     { href: '/settings', icon: Settings, label: 'Settings' },
   ];
+
+  const handleLogout = () => {
+    router.push('/');
+  };
 
   return (
     <div className="flex min-h-screen w-full">
@@ -69,7 +74,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         <div className="mt-auto">
-          <Button variant="ghost" className="w-full justify-start">
+          <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
             <LogOut className="mr-2 h-4 w-4" />
             Logout
           </Button>
@@ -107,7 +112,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <Link href="/settings">Settings</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Logout</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
