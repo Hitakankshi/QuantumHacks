@@ -17,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Send } from 'lucide-react';
+import { sendContactMessage } from './actions';
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -30,10 +31,12 @@ const formSchema = z.object({
   }),
 });
 
+export type ContactFormValues = z.infer<typeof formSchema>;
+
 export default function ContactPage() {
   const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<ContactFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
@@ -42,13 +45,22 @@ export default function ContactPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    toast({
-      title: 'Message Sent!',
-      description: "Thanks for reaching out. We'll get back to you shortly.",
-    });
-    form.reset();
+  async function onSubmit(values: ContactFormValues) {
+    const result = await sendContactMessage(values);
+
+    if (result.success) {
+      toast({
+        title: 'Message Sent!',
+        description: "Thanks for reaching out. We'll get back to you shortly.",
+      });
+      form.reset();
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Uh oh! Something went wrong.',
+        description: result.error || 'Could not send your message.',
+      });
+    }
   }
 
   return (
@@ -105,9 +117,9 @@ export default function ContactPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit">
+              <Button type="submit" disabled={form.formState.isSubmitting}>
                 <Send className="mr-2 h-4 w-4" />
-                Send Message
+                {form.formState.isSubmitting ? 'Sending...' : 'Send Message'}
               </Button>
             </form>
           </Form>
