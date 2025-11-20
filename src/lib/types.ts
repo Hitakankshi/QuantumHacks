@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 export type Issue = {
   id: string;
   category: 'Performance' | 'SEO' | 'Security' | 'Accessibility';
@@ -10,7 +12,7 @@ export type Issue = {
 export type Report = {
   id: string;
   url: string;
-  scanDate: string;
+  scanDate: string | Timestamp;
   score: number;
   summary?: string;
   issues: Issue[];

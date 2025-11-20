@@ -1,39 +1,36 @@
-import { getReportById } from '@/lib/data';
-import { notFound } from 'next/navigation';
+'use client';
+
+import { notFound, useParams } from 'next/navigation';
 import ReportDetails from './_components/report-details';
-import { headers } from 'next/headers';
-import { auth } from 'firebase-admin';
-import { getFirebaseAdminApp } from '@/firebase/admin';
+import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import type { Report } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
-type ReportPageProps = {
-  params: {
-    id: string;
-  };
-};
+export default function ReportPage() {
+  const { id: reportId } = useParams();
+  const { user, isUserLoading } = useUser();
+  const firestore = useFirestore();
 
-async function getUserId() {
-  const sessionCookie = headers().get('__session');
-  if (!sessionCookie) {
-    return null;
-  }
-  try {
-    const adminApp = getFirebaseAdminApp();
-    const decodedClaims = await auth(adminApp).verifySessionCookie(sessionCookie, true);
-    return decodedClaims.uid;
-  } catch (error) {
-    console.error('Error verifying session cookie:', error);
-    return null;
-  }
-}
+  const reportRef = useMemoFirebase(() => {
+    if (!user || !reportId) return null;
+    return doc(firestore, `users/${user.uid}/websiteReports`, reportId as string);
+  }, [firestore, user, reportId]);
 
-export default async function ReportPage({ params }: ReportPageProps) {
-  const userId = await getUserId();
-  if (!userId) {
-    // Or redirect to login
-    return notFound();
+  const { data: report, isLoading: isReportLoading } = useDoc<Report>(reportRef);
+
+  if (isUserLoading || isReportLoading) {
+    return (
+        <div className="space-y-8">
+            <div className="space-y-2">
+                <Skeleton className="h-10 w-1/2" />
+                <Skeleton className="h-4 w-1/4" />
+            </div>
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-64 w-full" />
+      </div>
+    )
   }
-  
-  const report = await getReportById(userId, params.id);
 
   if (!report) {
     notFound();

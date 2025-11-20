@@ -15,11 +15,10 @@ import { Bell, CreditCard, Home, LineChart, LogOut, Mail, Settings, User } from 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import type React from 'react';
-import { useUser, useAuth, useCollection, useMemoFirebase } from '@/firebase';
+import { useUser, useAuth, useCollection, useMemoFirebase, useFirestore } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import type { Report } from '@/lib/types';
 import { collection, query, orderBy } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -58,7 +57,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <aside className="hidden w-64 flex-col border-r bg-card p-4 sm:flex">
         <div className="mb-8 flex items-center gap-2">
           <Icons.Logo className="h-8 w-8 text-primary" />
-          <h2 className="text-xl font-bold">QuantumHacks</h2>
+          <h2 className="text-xl font-bold">SiteSleuth</h2>
         </div>
         <nav className="flex flex-col gap-1">
           {navItems.map((item) => (

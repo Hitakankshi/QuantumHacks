@@ -10,6 +10,7 @@ import type { Issue, Report } from '@/lib/types';
 import { format } from 'date-fns';
 import { AlertCircle, CheckCircle, Flame, Gauge, Lightbulb, Search, Shield, TriangleAlert, Zap } from 'lucide-react';
 import { SolutionGenerator } from './solution-generator';
+import { Timestamp } from 'firebase/firestore';
 
 const categoryIcons = {
   Performance: <Gauge className="h-5 w-5" />,
@@ -40,6 +41,13 @@ const getScoreColor = (score: number) => {
   return 'bg-primary';
 };
 
+function getFormattedDate(scanDate: string | Timestamp) {
+    if (typeof scanDate === 'string') {
+        return format(new Date(scanDate), 'PPP');
+    }
+    return format(scanDate.toDate(), 'PPP');
+}
+
 export default function ReportDetails({ report }: { report: Report }) {
   const issuesByCategory = (category: Issue['category']) =>
     report.issues.filter((issue) => issue.category === category);
@@ -51,7 +59,7 @@ export default function ReportDetails({ report }: { report: Report }) {
       <div>
         <h1 className="text-3xl font-bold break-all">{new URL(report.url).hostname}</h1>
         <p className="text-muted-foreground">
-          Report generated on {format(new Date(report.scanDate), 'PPP')}
+          Report generated on {getFormattedDate(report.scanDate)}
         </p>
       </div>
 

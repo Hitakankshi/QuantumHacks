@@ -1,4 +1,5 @@
-import { getReports } from '@/lib/data';
+'use client';
+
 import {
   Card,
   CardContent,
@@ -21,33 +22,27 @@ import { ArrowUpRight, BarChart, FileText, ShieldCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import { URLForm } from './_components/url-form';
 import { Progress } from '@/components/ui/progress';
-import { auth } from 'firebase-admin';
-import { headers } from 'next/headers';
-import { getFirebaseAdminApp } from '@/firebase/admin';
+import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, query, orderBy } from 'firebase/firestore';
+import type { Report } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
-async function getUserId() {
-  const sessionCookie = headers().get('__session');
-  if (!sessionCookie) {
-    return null;
-  }
-  try {
-    const adminApp = getFirebaseAdminApp();
-    const decodedClaims = await auth(adminApp).verifySessionCookie(sessionCookie, true);
-    return decodedClaims.uid;
-  } catch (error) {
-    console.error('Error verifying session cookie:', error);
-    return null;
-  }
-}
+export default function DashboardPage() {
+  const { user, isUserLoading } = useUser();
+  const firestore = useFirestore();
 
-export default async function DashboardPage() {
-  const userId = await getUserId();
-  
-  // Fetch reports only if a user is logged in
-  const reports = userId ? await getReports(userId) : [];
+  const reportsQuery = useMemoFirebase(() => {
+    if (!user) return null;
+    return query(
+      collection(firestore, `users/${user.uid}/websiteReports`),
+      orderBy('scanDate', 'desc')
+    );
+  }, [firestore, user]);
+
+  const { data: reports, isLoading: areReportsLoading } = useCollection<Report>(reportsQuery);
 
   const averageScore =
-    reports.length > 0
+    reports && reports.length > 0
       ? reports.reduce((acc, r) => acc + r.score, 0) / reports.length
       : 0;
 
@@ -70,6 +65,8 @@ export default async function DashboardPage() {
     return 'text-primary';
   };
 
+  const isLoading = isUserLoading || areReportsLoading;
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -85,7 +82,7 @@ export default async function DashboardPage() {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{reports.length}</div>
+            {isLoading ? <Skeleton className="h-8 w-1/4" /> : <div className="text-2xl font-bold">{reports?.length || 0}</div>}
             <p className="text-xs text-muted-foreground">
               Number of websites scanned
             </p>
@@ -97,7 +94,7 @@ export default async function DashboardPage() {
             <ShieldCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{averageScore.toFixed(0)}</div>
+          {isLoading ? <Skeleton className="h-8 w-1/4" /> : <div className="text-2xl font-bold">{averageScore.toFixed(0)}</div>}
             <p className="text-xs text-muted-foreground">
               Across all scanned websites
             </p>
@@ -111,7 +108,12 @@ export default async function DashboardPage() {
             <BarChart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            {reports.length > 0 ? (
+            {isLoading ? (
+              <div className="space-y-2">
+                <Skeleton className="h-7 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
+              </div>
+            ) : reports && reports.length > 0 ? (
               <>
                 <div className="truncate text-2xl font-bold">
                   {new URL(reports[0].url).hostname}
@@ -135,7 +137,13 @@ export default async function DashboardPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {reports.length > 0 ? (
+          {isLoading ? (
+            <div className="space-y-4">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+            </div>
+          ) : reports && reports.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
