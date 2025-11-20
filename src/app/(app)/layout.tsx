@@ -16,11 +16,15 @@ import { Bell, CreditCard, Home, LineChart, LogOut, Mail, Settings, User } from 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import type React from 'react';
+import { useUser, useAuth } from '@/firebase';
+import { signOut } from 'firebase/auth';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const reports = getReports();
+  const { user } = useUser();
+  const auth = useAuth();
 
   const navItems = [
     { href: '/dashboard', icon: Home, label: 'Dashboard' },
@@ -30,8 +34,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: '/settings', icon: Settings, label: 'Settings' },
   ];
 
-  const handleLogout = () => {
-    router.push('/login');
+  const handleLogout = async () => {
+    if (!auth) return;
+    await signOut(auth);
+    router.push('/');
   };
 
   return (
@@ -94,13 +100,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="rounded-full">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src="https://picsum.photos/seed/user/100/100" />
-                    <AvatarFallback>U</AvatarFallback>
+                    <AvatarImage src={user?.photoURL || ''} />
+                    <AvatarFallback>{user?.displayName?.charAt(0) || user?.email?.charAt(0)}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuLabel>{user?.displayName || user?.email}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/profile">Profile</Link>
