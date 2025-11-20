@@ -1,0 +1,116 @@
+/**
+ * Core Philosophy: This ruleset enforces a strict user-ownership model where all user-generated data
+ * is siloed within a path dedicated to that user. Access control is primarily determined by the path
+ * of the document, ensuring that users can only interact with their own data.
+ *
+ * Data Structure: The data is organized hierarchically. Each user has a root document at /users/{userId}.
+ * All private, user-specific data, such as website reports (/websiteReports) and their associated issues
+ * (/issues), are stored in subcollections under this root user document. A top-level /solutions
+ * collection holds public, read-only data that is globally accessible.
+ *
+ * Key Security Decisions:
+ * - Strict User Data Silos: All data in /users/{userId} and its subcollections is accessible only
+ *   to the authenticated user whose UID matches {userId}.
+ * - No User Listing: To protect user privacy, it is not possible to list all documents in the top-level
+ *   /users collection.
+ * - Public Read-Only Data: The /solutions collection is publicly readable by anyone, but client-side
+ *   writes are explicitly forbidden to ensure data integrity. These documents are expected to be managed
+ *   by a trusted backend service or administrator.
+ * - Path-Based Security: Authorization relies on the document path (/users/{userId}/...) rather than
+ *   costly `get()` calls to other documents, making the rules faster and more secure.
+ * - Relational Integrity: On document creation, rules validate that internal ID fields (e.g., `userId`)
+ *   match the corresponding IDs in the document path. These fields are enforced as immutable on updates.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions for common authorization logic.
+
+    /**
+     * Checks if a user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the currently authenticated user's UID matches the provided userId.
+     * This is the primary function for validating resource ownership.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Ensures the user is the owner and the document already exists.
+     * CRITICAL for preventing writes to non-existent documents on update/delete.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * @description Secures a user's profile document. Users can create, read, update, and
+     *              delete their own profile, but cannot see or list other users' profiles.
+     * @path        /users/{userId}
+     * @allow       Authenticated user with uid 'user_abc' can (create) their own document at /users/user_abc.
+     * @deny        Authenticated user 'user_xyz' cannot (get) a document at /users/user_abc.
+     * @principle   Restricts access to a user's own data tree (Self-Creation & Ownership).
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+
+      /**
+       * @description Secures website reports, which are owned by a specific user.
+       * @path        /users/{userId}/websiteReports/{websiteReportId}
+       * @allow       User 'user_abc' can (create) a report under /users/user_abc/websiteReports/.
+       * @deny        User 'user_xyz' cannot (list) reports under /users/user_abc/websiteReports/.
+       * @principle   Enforces document ownership for all operations based on the path.
+       */
+      match /websiteReports/{websiteReportId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+
+        /**
+         * @description Secures the issues associated with a specific website report. Access is
+         *              inherited from the parent user document.
+         * @path        /users/{userId}/websiteReports/{websiteReportId}/issues/{issueId}
+         * @allow       User 'user_abc' can (get) an issue at /users/user_abc/websiteReports/report123/issues/issue456.
+         * @deny        User 'user_xyz' cannot (delete) an issue under user 'user_abc's path.
+         * @principle   Validates relational integrity by ensuring the issue's data links back to its parent report.
+         */
+        match /issues/{issueId} {
+          allow get: if isOwner(userId);
+          allow list: if isOwner(userId);
+          allow create: if isOwner(userId) && request.resource.data.websiteReportId == websiteReportId;
+          allow update: if isExistingOwner(userId) && request.resource.data.websiteReportId == resource.data.websiteReportId;
+          allow delete: if isExistingOwner(userId);
+        }
+      }
+    }
+
+    /**
+     * @description Defines the /solutions collection as public, read-only data. Anyone,
+     *              including unauthenticated users, can read solution documents.
+     * @path        /solutions/{solutionId}
+     * @allow       Any user, signed-in or not, can (get) a document at /solutions/solution123.
+     * @deny        Any client, signed-in or not, cannot (create), (update), or (delete) any solution.
+     * @principle   Provides public access to read-only data while securing it from modification.
+     */
+    match /solutions/{solutionId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+  }
+}

@@ -1,0 +1,223 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the SiteSleuth platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        },
+        "firstName": {
+          "type": "string",
+          "description": "First name of the user."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "Last name of the user."
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "firstName",
+        "lastName"
+      ]
+    },
+    "WebsiteReport": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WebsiteReport",
+      "type": "object",
+      "description": "Represents a diagnostic report for a specific website.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the WebsiteReport entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N WebsiteReport)"
+        },
+        "url": {
+          "type": "string",
+          "description": "The URL of the website that was scanned."
+        },
+        "scanDate": {
+          "type": "string",
+          "description": "The date and time when the website scan was performed.",
+          "format": "date-time"
+        },
+        "reportSummary": {
+          "type": "string",
+          "description": "A summary of the findings from the website scan."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "url",
+        "scanDate",
+        "reportSummary"
+      ]
+    },
+    "Issue": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Issue",
+      "type": "object",
+      "description": "Represents a specific issue identified during a website scan.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Issue entity."
+        },
+        "websiteReportId": {
+          "type": "string",
+          "description": "Reference to WebsiteReport. (Relationship: WebsiteReport 1:N Issue)"
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of issue (e.g., broken link, performance bottleneck, SEO error)."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the issue."
+        },
+        "severity": {
+          "type": "string",
+          "description": "The severity of the issue (e.g., critical, high, medium, low)."
+        },
+        "solutionId": {
+          "type": "string",
+          "description": "Reference to Solution. (Relationship: Issue 1:1 Solution)"
+        }
+      },
+      "required": [
+        "id",
+        "websiteReportId",
+        "type",
+        "description",
+        "severity",
+        "solutionId"
+      ]
+    },
+    "Solution": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Solution",
+      "type": "object",
+      "description": "Represents a solution for a specific issue identified during a website scan.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Solution entity."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the solution."
+        },
+        "steps": {
+          "type": "string",
+          "description": "Step-by-step instructions on how to implement the solution."
+        }
+      },
+      "required": [
+        "id",
+        "description",
+        "steps"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Collection for storing user profiles.  User documents are only accessible to the user themselves.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/websiteReports/{websiteReportId}",
+        "definition": {
+          "entityName": "WebsiteReport",
+          "schema": {
+            "$ref": "#/backend/entities/WebsiteReport"
+          },
+          "description": "Collection for storing website reports for a specific user. This collection is path-based owned.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "websiteReportId",
+              "description": "The unique identifier for the website report."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/websiteReports/{websiteReportId}/issues/{issueId}",
+        "definition": {
+          "entityName": "Issue",
+          "schema": {
+            "$ref": "#/backend/entities/Issue"
+          },
+          "description": "Collection for storing issues found in a specific website report for a specific user.  This collection is path-based owned.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "websiteReportId",
+              "description": "The unique identifier for the website report."
+            },
+            {
+              "name": "issueId",
+              "description": "The unique identifier for the issue."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/solutions/{solutionId}",
+        "definition": {
+          "entityName": "Solution",
+          "schema": {
+            "$ref": "#/backend/entities/Solution"
+          },
+          "description": "Collection for storing solutions to issues.",
+          "params": [
+            {
+              "name": "solutionId",
+              "description": "The unique identifier for the solution."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to ensure security, scalability, and ease of debugging, following the principles of Authorization Independence, Clarity of Intent, DBAC, and QAPs. We are employing Structural Segregation for homogeneous security postures.  Since WebsiteReports are private to a user, we leverage path-based ownership.  Issues are also private to a user, and related to a specific WebsiteReport, so we nest issues under WebsiteReports under users.  Solutions are globally available to all users, and are not private, so they are in their own collection at the top level. Thus, to reduce storage costs, the solution is included in the issue documents. \n\nAuthorization Independence is achieved through path-based ownership: access to website reports and issues is determined directly by the user ID in the path (`/users/{userId}/websiteReports/{websiteReportId}` and `/users/{userId}/websiteReports/{websiteReportId}/issues/{issueId}`). This avoids the need for `get()` calls in security rules, enabling atomic operations.\n\nQAPs are supported by structural segregation: each collection has a clear security posture based on its path. Listing website reports and issues is secure because access is controlled by the user ID in the path, ensuring that only the owner can access their data.  Solutions are global and do not contain any user data, so listing them is also straightforward."
+  }
+}
