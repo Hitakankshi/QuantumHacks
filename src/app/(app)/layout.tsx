@@ -31,7 +31,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   ];
 
   const handleLogout = () => {
-    router.push('/');
+    router.push('/login');
   };
 
   return (

@@ -41,10 +41,10 @@ export default function LandingPage() {
         </div>
         <nav className="flex items-center gap-4">
           <Button variant="ghost" asChild>
-            <Link href="/dashboard">Log In</Link>
+            <Link href="/login">Log In</Link>
           </Button>
           <Button asChild>
-            <Link href="/dashboard">Get Started</Link>
+            <Link href="/signup">Sign Up</Link>
           </Button>
         </nav>
       </header>
@@ -57,7 +57,7 @@ export default function LandingPage() {
               Deploy Solutions Instantly.
             </h2>
             <p className="mt-6 text-lg text-muted-foreground max-w-xl mx-auto">
-              SiteSleuth is your AI-powered partner for identifying website issues and providing actionable fixes. Turn bugs into improvements, effortlessly.
+              QuantumHacks is your AI-powered partner for identifying website issues and providing actionable fixes. Turn bugs into improvements, effortlessly.
             </p>
             <div className="mt-8 flex justify-center gap-4">
               <Button size="lg" asChild>
