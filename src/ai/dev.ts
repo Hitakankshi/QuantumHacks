@@ -3,3 +3,4 @@ config();
 
 import '@/ai/flows/summarize-report-findings.ts';
 import '@/ai/flows/generate-actionable-solutions.ts';
+import '@/ai/flows/scan-website.ts';

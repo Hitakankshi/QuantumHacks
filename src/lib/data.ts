@@ -1,6 +1,19 @@
 import type { Report } from './types';
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  getDoc,
+  doc,
+  DocumentData,
+  CollectionReference,
+} from 'firebase/firestore';
+import { firestore } from '@/firebase'; // Assuming you have a firestore instance export
+import { getFirebaseAdminApp } from '@/firebase/admin';
+import { getFirestore as getAdminFirestore } from 'firebase-admin/firestore';
 
-export const reports: Report[] = [
+export const reports_mock: Report[] = [
   {
     id: 'report-1',
     url: 'https://example-ecommerce.com',
@@ -129,10 +142,29 @@ export const reports: Report[] = [
   },
 ];
 
-export function getReports() {
-  return reports;
+export async function getReports(userId: string): Promise<Report[]> {
+  const adminFirestore = getAdminFirestore(getFirebaseAdminApp());
+  const reportsRef = adminFirestore.collection(`users/${userId}/websiteReports`);
+  const snapshot = await reportsRef.orderBy('scanDate', 'desc').get();
+  
+  if (snapshot.empty) {
+    return [];
+  }
+
+  return snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as Report[];
 }
 
-export function getReportById(id: string) {
-  return reports.find((report) => report.id === id);
+export async function getReportById(userId: string, id: string): Promise<Report | null> {
+  const adminFirestore = getAdminFirestore(getFirebaseAdminApp());
+  const reportRef = adminFirestore.doc(`users/${userId}/websiteReports/${id}`);
+  const docSnap = await reportRef.get();
+
+  if (!docSnap.exists) {
+    return null;
+  }
+
+  return { id: docSnap.id, ...docSnap.data() } as Report;
 }

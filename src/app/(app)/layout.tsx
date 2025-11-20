@@ -11,20 +11,33 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { getReports } from '@/lib/data';
 import { Bell, CreditCard, Home, LineChart, LogOut, Mail, Settings, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import type React from 'react';
-import { useUser, useAuth } from '@/firebase';
+import { useUser, useAuth, useCollection, useMemoFirebase } from '@/firebase';
 import { signOut } from 'firebase/auth';
+import type { Report } from '@/lib/types';
+import { collection, query, orderBy } from 'firebase/firestore';
+import { useFirestore } from '@/firebase';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const reports = getReports();
   const { user } = useUser();
   const auth = useAuth();
+  const firestore = useFirestore();
+
+  const reportsQuery = useMemoFirebase(() => {
+    if (!user) return null;
+    return query(
+      collection(firestore, 'users', user.uid, 'websiteReports'),
+      orderBy('scanDate', 'desc')
+    );
+  }, [firestore, user]);
+
+  const { data: reports, isLoading: areReportsLoading } = useCollection<Report>(reportsQuery);
 
   const navItems = [
     { href: '/dashboard', icon: Home, label: 'Dashboard' },
@@ -64,7 +77,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="mt-8 flex flex-col gap-2">
           <h3 className="px-4 text-sm font-semibold text-muted-foreground">Reports</h3>
           <div className="flex flex-col gap-1">
-            {reports.map((report) => (
+            {areReportsLoading && (
+              <>
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+              </>
+            )}
+            {reports?.map((report) => (
               <Link key={report.id} href={`/report/${report.id}`}>
                 <Button
                   variant={pathname === `/report/${report.id}` ? 'secondary' : 'ghost'}
