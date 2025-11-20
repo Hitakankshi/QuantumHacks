@@ -1,3 +1,28 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-dashboard",
+      "description": "A screenshot of the SiteSleuth dashboard showing various website reports.",
+      "imageUrl": "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxkYXNoYm9hcmQlMjBjb21wdXRlcnxlbnwwfHx8fDE3NjM2Njk2MTV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "dashboard computer"
+    },
+    {
+      "id": "feature-scan",
+      "description": "An abstract graphic representing a website scan.",
+      "imageUrl": "https://images.unsplash.com/photo-1738082956233-b8f1803411d3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxuZXR3b3JrJTIwYWJzdHJhY3R8ZW58MHx8fHwxNzYzNTkxNjgwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "network abstract"
+    },
+    {
+      "id": "feature-report",
+      "description": "An icon representing a detailed report.",
+      "imageUrl": "https://images.unsplash.com/photo-1543286386-713bdd548da4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxyZXBvcnQlMjBjaGFydHxlbnwwfHx8fDE3NjM2MTc4MDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "report chart"
+    },
+    {
+      "id": "feature-solution",
+      "description": "An icon representing an AI-powered solution.",
+      "imageUrl": "https://images.unsplash.com/photo-1601520525463-f3a1b2c1c630?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxsaWdodGJ1bGIlMjBpZGVhfGVufDB8fHx8MTc2MzY2Mzg2Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "lightbulb idea"
+    }
+  ]
 }
