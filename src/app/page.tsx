@@ -37,7 +37,7 @@ export default function LandingPage() {
       <header className="container mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Icons.Logo className="h-8 w-8 text-primary" />
-          <h1 className="text-2xl font-bold text-foreground">SiteSleuth</h1>
+          <h1 className="text-2xl font-bold text-foreground">QuantumHacks</h1>
         </div>
         <nav className="flex items-center gap-4">
           <Button variant="ghost" asChild>
