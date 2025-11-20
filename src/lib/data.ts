@@ -3,7 +3,7 @@ import type { Report } from './types';
 export const reports: Report[] = [
   {
     id: 'report-1',
-    url: 'https.example-ecommerce.com',
+    url: 'https://example-ecommerce.com',
     scanDate: '2024-07-29',
     score: 78,
     issues: [
