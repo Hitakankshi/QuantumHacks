@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { getReports } from '@/lib/data';
 import { cn } from '@/lib/utils';
-import { Bell, Home, LineChart, LogOut, Settings } from 'lucide-react';
+import { Bell, Home, LineChart, LogOut, Mail, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type React from 'react';
@@ -24,6 +24,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { href: '/dashboard', icon: Home, label: 'Dashboard' },
+    { href: '/contact', icon: Mail, label: 'Contact Us' },
     { href: '/settings', icon: Settings, label: 'Settings' },
   ];
 
