@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { Issue, Report } from '@/lib/types';
 import { format } from 'date-fns';
-import { AlertCircle, CheckCircle, Flame, Gauge, Lightbulb, Search, Shield, TriangleAlert, Zap } from 'lucide-re';
+import { AlertCircle, CheckCircle, Flame, Gauge, Lightbulb, Search, Shield, TriangleAlert, Zap } from 'lucide-react';
 import { SolutionGenerator } from './solution-generator';
 
 const categoryIcons = {
