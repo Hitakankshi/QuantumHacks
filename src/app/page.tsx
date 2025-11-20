@@ -112,7 +112,7 @@ export default function LandingPage() {
         <div className="flex flex-col sm:flex-row justify-between items-center">
           <div className="flex items-center gap-2">
             <Icons.Logo className="h-6 w-6 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} SiteSleuth. All rights reserved.</p>
+            <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} QuantumHacks. All rights reserved.</p>
           </div>
           <div className="flex gap-4 mt-4 sm:mt-0">
             <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">Privacy Policy</Link>

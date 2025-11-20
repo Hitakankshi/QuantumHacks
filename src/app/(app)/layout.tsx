@@ -33,7 +33,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <aside className="hidden w-64 flex-col border-r bg-card p-4 sm:flex">
         <div className="flex items-center gap-2 mb-8">
           <Icons.Logo className="h-8 w-8 text-primary" />
-          <h2 className="text-xl font-bold">SiteSleuth</h2>
+          <h2 className="text-xl font-bold">QuantumHacks</h2>
         </div>
         <nav className="flex flex-col gap-1">
           {navItems.map((item) => (

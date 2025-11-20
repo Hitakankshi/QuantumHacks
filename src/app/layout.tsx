@@ -4,7 +4,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'SiteSleuth',
+  title: 'QuantumHacks',
   description: 'A professional website diagnostic platform for owners to identify bugs and receive solutions.',
 };
 
