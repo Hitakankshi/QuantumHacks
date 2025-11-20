@@ -12,8 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { getReports } from '@/lib/data';
-import { cn } from '@/lib/utils';
-import { Bell, Home, LineChart, LogOut, Mail, Settings } from 'lucide-react';
+import { Bell, CreditCard, Home, LineChart, LogOut, Mail, Settings, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type React from 'react';
@@ -24,6 +23,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { href: '/dashboard', icon: Home, label: 'Dashboard' },
+    { href: '/profile', icon: User, label: 'Profile' },
+    { href: '/billing', icon: CreditCard, label: 'Billing' },
     { href: '/contact', icon: Mail, label: 'Contact Us' },
     { href: '/settings', icon: Settings, label: 'Settings' },
   ];
@@ -31,7 +32,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen w-full">
       <aside className="hidden w-64 flex-col border-r bg-card p-4 sm:flex">
-        <div className="flex items-center gap-2 mb-8">
+        <div className="mb-8 flex items-center gap-2">
           <Icons.Logo className="h-8 w-8 text-primary" />
           <h2 className="text-xl font-bold">QuantumHacks</h2>
         </div>
@@ -96,8 +97,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Billing</DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/billing">Billing</Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/settings">Settings</Link>
                 </DropdownMenuItem>
