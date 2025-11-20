@@ -52,6 +52,18 @@ export default function SignupPage() {
     router.push('/dashboard');
   }
 
+  function onGoogleSignUp() {
+    // In a real app, this would trigger the Firebase Google Auth flow
+    toast({
+        title: 'Signing up with Google...',
+        description: 'You will be redirected shortly.',
+    });
+    // Simulate a redirect to dashboard after a short delay
+    setTimeout(() => {
+        router.push('/dashboard');
+    }, 1000);
+  }
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
        <div className="absolute top-8 left-8">
@@ -65,7 +77,7 @@ export default function SignupPage() {
           <CardTitle>Sign Up</CardTitle>
           <CardDescription>Create your account to get started.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="grid gap-4">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -113,6 +125,19 @@ export default function SignupPage() {
               </Button>
             </form>
           </Form>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Or continue with
+              </span>
+            </div>
+          </div>
+          <Button variant="outline" className="w-full" onClick={onGoogleSignUp}>
+            Sign Up with Google
+          </Button>
         </CardContent>
         <CardFooter className="flex justify-center">
             <p className="text-sm text-muted-foreground">
